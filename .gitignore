@@ -1,0 +1,4 @@
+hazir_temps/
+.env
+db.sqlite3
+media/
