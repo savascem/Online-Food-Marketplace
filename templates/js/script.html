@@ -1,0 +1,61 @@
+<script>
+    function initAutoComplete(){
+        autocomplete = new google.maps.places.Autocomplete(
+        document.getElementById('id_address'),
+        {
+            types: ['geocode', 'establishment'],
+            //default in this app is "IN" - add your country code
+            componentRestrictions: {'country': ['tr']},
+        })
+    // function to specify what should happen when the prediction is clicked
+    autocomplete.addListener('place_changed', onPlaceChanged);
+    }
+    
+    function onPlaceChanged (){
+        var place = autocomplete.getPlace();
+    
+        // User did not select the prediction. Reset the input field or alert()
+        if (!place.geometry){
+            document.getElementById('id_address').placeholder = "Start typing...";
+        }
+        else{
+            // console.log('place name=>', place.name)
+        }
+    
+        // get the address components and assign them to the fields
+        // console.log(place);
+        var geocoder = new google.maps.Geocoder()
+        var address = document.getElementById('id_address').value
+    
+        geocoder.geocode({'address': address}, function(results, status){
+            // console.log('results=>', results)
+            // console.log('status=>', status)
+            if(status == google.maps.GeocoderStatus.OK){
+                var latitude = results[0].geometry.location.lat();
+                var longitude = results[0].geometry.location.lng();
+    
+                // console.log('lat=>', latitude);
+                // console.log('long=>', longitude);
+                $('#id_latitude').val(latitude);
+                $('#id_longitude').val(longitude);
+    
+                $('#id_address').val(address);
+            }
+        });
+
+        const cityObj = place.address_components.find(component => component.types.includes('administrative_area_level_2'));
+        const stateObj = place.address_components.find(component => component.types.includes('administrative_area_level_1'));
+        const countryObj = place.address_components.find(component => component.types.includes('country'));
+        const pinCodeObj = place.address_components.find(component => component.types.includes('postal_code'));
+
+        const city = cityObj ? cityObj.long_name : '';
+        const state = stateObj ? stateObj.long_name : '';
+        const country = countryObj ? countryObj.long_name : '';
+        const pinCode = pinCodeObj ? pinCodeObj .long_name : '';
+
+        $('#id_city').val(city);
+        $('#id_state').val(state);
+        $('#id_country').val(country);
+        $('#id_pin_code').val(pinCode);
+    };
+</script>
